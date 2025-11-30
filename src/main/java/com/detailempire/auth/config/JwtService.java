@@ -1,6 +1,6 @@
 package com.detailempire.auth.config;
 
-
+import com.detailempire.auth.model.UserEntity;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,10 +29,18 @@ public class JwtService {
         return extractAllClaims(token).getSubject();
     }
 
+    // 👇 MÉTODO QUE CAMBIAMOS
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        // aquí podrías agregar claims extra si quieres
-        return buildToken(claims, userDetails.getUsername());
+
+        // Si el userDetails es tu entidad UserEntity, agregamos datos extras al token
+        if (userDetails instanceof UserEntity user) {
+            claims.put("userId", user.getId());
+            claims.put("role", user.getRole());   // CLIENT / ADMIN
+            claims.put("name", user.getName());
+        }
+
+        return buildToken(claims, userDetails.getUsername()); // username = email
     }
 
     private String buildToken(Map<String, Object> claims, String subject) {

@@ -1,4 +1,5 @@
 package com.detailempire.auth.model;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -36,6 +37,10 @@ public class UserEntity implements UserDetails {
     private Role role;
 
     private boolean enabled = true;
+
+    private String resetToken;
+    private LocalDateTime resetTokenExpiry;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

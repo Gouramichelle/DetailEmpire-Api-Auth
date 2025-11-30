@@ -8,6 +8,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.UUID;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -67,4 +70,33 @@ public class AuthService {
                 .role(user.getRole())
                 .build();
     }
+    public void initiatePasswordReset(String email) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("No existe un usuario con ese correo"));
+
+        String token = UUID.randomUUID().toString();
+        user.setResetToken(token);
+        user.setResetTokenExpiry(LocalDateTime.now().plusHours(1)); // token válido 1 hora
+        userRepository.save(user);
+
+        // Aquí normalmente enviarías un correo con el link
+        // Por ahora lo dejamos en consola para desarrollo:
+        System.out.println("Token de recuperación para " + email + ": " + token);
+    }
+
+    public void resetPassword(ResetPasswordRequest request) {
+        UserEntity user = userRepository.findByResetToken(request.getToken())
+                .orElseThrow(() -> new RuntimeException("Token de recuperación inválido"));
+
+        if (user.getResetTokenExpiry() == null || user.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("El token de recuperación ha expirado");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setResetToken(null);
+        user.setResetTokenExpiry(null);
+
+        userRepository.save(user);
+    }
+
 }

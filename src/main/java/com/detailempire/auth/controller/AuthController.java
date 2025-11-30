@@ -10,11 +10,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import com.detailempire.auth.model.ForgotPasswordRequest;
+import com.detailempire.auth.model.ResetPasswordRequest;
+import org.springframework.http.ResponseEntity;
+
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
     private final AuthService authService;
@@ -43,4 +47,18 @@ public class AuthController {
                 .role(user.getRole())
                 .build();
     }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        authService.initiatePasswordReset(request.getEmail());
+        return ResponseEntity.ok(
+                "Si el correo existe, se enviaron instrucciones para recuperar tu contraseña."
+        );
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok("Tu contraseña ha sido actualizada correctamente.");
+    }
+
 }
