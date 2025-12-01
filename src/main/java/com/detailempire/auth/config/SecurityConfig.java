@@ -70,7 +70,7 @@ public class SecurityConfig {
                 "http://localhost:5173", // 👈 Vite React (tu frontend actual)
                 "http://localhost:3000", // React viejo (si lo sigues usando)
                 "http://localhost:8081", // pruebas backend antiguas
-                "http://10.0.2.2:8081"   // emulador Android apuntando al host
+                "http://10.0.2.2:8080"   // emulador Android apuntando al host
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With", "Content-Type"));
